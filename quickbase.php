@@ -59,7 +59,7 @@
 		}		
 		$this->xml = $usexml;
 		
-		if ($this->username)
+		if ($this->user_name)
 		{
             $uid = $this->authenticate();
         

@@ -42,31 +42,31 @@ foreach($results->table->records->record as $record) {
 	$timeOfDay = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
 
 	$recordInfo = array(
-		"Record ID" => $record[0],
-		"Date" => $record[1]/1000,
-		"Time of Day" => $timeOfDay,
-		"Customer Address" => $record[3],
-		"Employee" => $record[4],
-		"Full Name" => $record[5],
-		"Cusomter City" => $record[6],
-		"Cusomter Marketing Source" => $record[7],
-		"Amount Paid" => $record[8],
-		"Transaction Type" => $record[9],
-		"Check Paid" => $record[10],
-		"Check Number(s)" => $record[11],
-		"Repeat Customer" => $record[12],
-		"Jewelry" => $record[13],
-		"Bullion" => $record[14],
-		"Total Price paid for Diamonds" => $record[15],
-		"Location" => $record[16],
-		"Marketing Source or Repeat" => $record[17],
-		"Time2" => $record[18],
-		"Date Created" => $record[19],
-		"Current Location" => $record[20],
-		"Current Location - Related Location" => $record[21],
-		"Notes" => $record[22],
-		"Customer Phone" => $record[23],
-		"Cusomter Email" => $record[24],
+		'recordId' => $record[0],
+		'date' => $record[1]/1000,
+		'timeOfDay' => $timeOfDay,
+		'customerAddress' => $record[3],
+		'employee' => $record[4],
+		'fullName' => $record[5],
+		'cusomterCity' => $record[6],
+		'cusomterMarketingSource' => $record[7],
+		'amountPaid' => $record[8],
+		'transactionType' => $record[9],
+		'checkPaid' => $record[10],
+		'checkNumbers' => $record[11],
+		'repeatCustomer' => $record[12],
+		'jewelry' => $record[13],
+		'bullion' => $record[14],
+		'totalPricePaidForDiamonds' => $record[15],
+		'location' => $record[16],
+		'marketingSourceOrRepeat' => $record[17],
+		'time2' => $record[18],
+		'dateCreated' => $record[19],
+		'currentLocation' => $record[20],
+		'currentLocation-RelatedLocation' => $record[21],
+		'notes' => $record[22],
+		'customerPhone' => $record[23],
+		'cusomterEmail' => $record[24],
 	);
 	// echo '<pre>'; print_r($recordInfo); echo '</pre>';die();
 
@@ -75,16 +75,16 @@ foreach($results->table->records->record as $record) {
 	$xmlDoc->formatOutput = true;
 	// print_r($xmlDoc->saveXML());die();
 
-	$filePath = 'xml/'.gmdate("Y", $recordInfo['Date']).'/'.gmdate("m", $recordInfo['Date']).'/'.gmdate("d", $recordInfo['Date']);
+	$filePath = 'xml/'.gmdate("Y", $recordInfo['date']).'/'.gmdate("m", $recordInfo['date']).'/'.gmdate("d", $recordInfo['date']);
 
 	if (!file_exists($filePath)) {
     	mkdir($filePath, 0777, true);
 	}
 
-	if ($xmlDoc->save($filePath."/".$recordInfo['Record ID'].".xml")) {
-		echo 'Saved Record ID '.$recordInfo['Record ID'].' to '.$filePath.'<br/><br/>';
+	if ($xmlDoc->save($filePath."/".$recordInfo['recordId'].".xml")) {
+		echo 'Saved Record ID '.$recordInfo['recordId'].' to '.$filePath.'<br/><br/>';
 	} else {
-		echo 'Did not save Record ID '.$recordInfo['Record ID'].'<br/><br/>';
+		echo 'Did not save Record ID '.$recordInfo['recordId'].'<br/><br/>';
 	}
 }
 
@@ -115,14 +115,14 @@ function create_xml($recordInfo) {
     	$xmlDoc->createElement("propertyTransaction"));
 
 	$transactionTime = $propertyTransaction->appendChild(
-    	$xmlDoc->createElement("transactionTime", gmdate('Y-m-d', $recordInfo['Date']).'T'.$recordInfo['Time of Day']));
+    	$xmlDoc->createElement("transactionTime", gmdate('Y-m-d', $recordInfo['date']).'T'.$recordInfo['timeOfDay']));
 
 	$customer = $propertyTransaction->appendChild(
     	$xmlDoc->createElement("customer"));
 	$custLastName = $customer->appendChild(
-    	$xmlDoc->createElement("custLastName", $recordInfo['Full Name']));
+    	$xmlDoc->createElement("custLastName", $recordInfo['fullName']));
 	$custFirstName = $customer->appendChild(
-    	$xmlDoc->createElement("custFirstName", $recordInfo['Full Name']));
+    	$xmlDoc->createElement("custFirstName", $recordInfo['fullName']));
 	$custMiddleName = $customer->appendChild(
     	$xmlDoc->createElement("custMiddleName", "one"));
 	$gender = $customer->appendChild(

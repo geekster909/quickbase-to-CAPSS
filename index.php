@@ -34,10 +34,17 @@ foreach($results->table->records->record as $record) {
 	$record = json_decode(json_encode($record->f), true);
 	// echo '<pre>'; print_r($record); echo '</pre>';die('here');
 
+	//convert time of day from seconds to hours:mins:seconds
+	$record[2] = $record[2]/1000;
+	$hours = floor($record[2] / 3600);
+	$mins = floor($record[2] / 60 % 60);
+	$secs = floor($record[2] % 60);
+	$timeOfDay = sprintf('%02d:%02d:%02d', $hours, $mins, $secs);
+
 	$recordInfo = array(
 		"Record ID" => $record[0],
-		"Date" => $record[1],
-		"Time of Day" => $record[2],
+		"Date" => $record[1]/1000,
+		"Time of Day" => $timeOfDay,
 		"Customer Address" => $record[3],
 		"Employee" => $record[4],
 		"Full Name" => $record[5],
@@ -68,7 +75,7 @@ foreach($results->table->records->record as $record) {
 	$xmlDoc->formatOutput = true;
 	// print_r($xmlDoc->saveXML());die();
 
-	$filePath = 'xml/'.gmdate("Y", $recordInfo['Date'] / 1000).'/'.gmdate("m", $recordInfo['Date'] / 1000).'/'.gmdate("d", $recordInfo['Date'] / 1000);
+	$filePath = 'xml/'.gmdate("Y", $recordInfo['Date']).'/'.gmdate("m", $recordInfo['Date']).'/'.gmdate("d", $recordInfo['Date']);
 
 	if (!file_exists($filePath)) {
     	mkdir($filePath, 0777, true);
@@ -108,14 +115,14 @@ function create_xml($recordInfo) {
     	$xmlDoc->createElement("propertyTransaction"));
 
 	$transactionTime = $propertyTransaction->appendChild(
-    	$xmlDoc->createElement("transactionTime", "2016-11-01T11:30:00"));
+    	$xmlDoc->createElement("transactionTime", gmdate('Y-m-d', $recordInfo['Date']).'T'.$recordInfo['Time of Day']));
 
 	$customer = $propertyTransaction->appendChild(
     	$xmlDoc->createElement("customer"));
 	$custLastName = $customer->appendChild(
-    	$xmlDoc->createElement("custLastName", "SMITH"));
+    	$xmlDoc->createElement("custLastName", $recordInfo['Full Name']));
 	$custFirstName = $customer->appendChild(
-    	$xmlDoc->createElement("custFirstName", "SMITH"));
+    	$xmlDoc->createElement("custFirstName", $recordInfo['Full Name']));
 	$custMiddleName = $customer->appendChild(
     	$xmlDoc->createElement("custMiddleName", "one"));
 	$gender = $customer->appendChild(

@@ -73,7 +73,7 @@
 				if (jsonResponse.status === 1){
 					results.innerHTML += `
 						Finished running scripts for location:  ${jsonResponse.location}<br/><br/>
-						Transactions Processed: ${jsonResponse.transactionCount}
+						Number of transactions processed: ${jsonResponse.transactionCount}<br/>
 						`;
 				} else {
 					results.innerHTML += `Error: ${jsonResponse.error}`;

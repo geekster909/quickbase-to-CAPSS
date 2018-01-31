@@ -4,6 +4,9 @@
 $qbUser     	= ''; // quickbase username
 $qbPassword 	= ''; // quickbase password
 $qbRealm 		= ''; // quickbase realm
-$qbDbId 		= ''; // quickbase database ID
+$qbDbTables		= array(
+					'table1' => '',
+					'table2' => ''
+				); // quickbase database ID's
 $qbUserToken 	= ''; // quickbase user token
 $qbAppToken 	= ''; // quickbase app token

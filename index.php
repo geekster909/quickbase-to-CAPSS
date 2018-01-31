@@ -75,6 +75,12 @@
 						Finished running scripts for location:  ${jsonResponse.location}<br/><br/>
 						Number of transactions processed: ${jsonResponse.transactionCount}<br/>
 						`;
+					
+					for (var transaction in jsonResponse.transactions) {
+						results.innerHTML += `
+							Processed transaction: ${transaction}<br/>
+						`;
+					}
 				} else {
 					results.innerHTML += `Error: ${jsonResponse.error}`;
 				}

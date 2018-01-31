@@ -1,3 +1,16 @@
+<style type="text/css">
+	#results {
+		min-height: 500px;
+		max-height: 500px;
+		width: 500px;
+		padding: 15px;
+		overflow-y: scroll;
+		border: solid 1px #000;
+		background-color: #f0ead6;
+	}
+
+</style>
+
 <form id="location-form" method="post">
 	<select id="js-location">
 		<option value="">--Select Location--</option>
@@ -17,7 +30,7 @@
 	<button id="form-submit" type="submit">Submit</button>
 </form>
 <div>
-	Results:
+	Console:
 	<div id="results">
 	</div>
 </div>
@@ -29,16 +42,19 @@
 	locationForm.addEventListener('submit', function(e){
 		e.preventDefault();
 		var selectedOption = document.getElementById('js-location').value;
-		
+
+		results.innerHTML += '----------------------------------- START REPORT -----------------------------------<br/>';
+
 		if (selectedOption != '') {
-			results.innerHTML = 'Running scripts for location: '+selectedOption+'<br/><br/>';
+			results.innerHTML += 'Running scripts for location: '+selectedOption+'<br/><br/>';
 			
 			document.getElementById("form-submit").disabled = true;
 			
 			ajax(selectedOption);
 
 		} else {
-			results.innerHTML = 'Please select a location';
+			results.innerHTML += 'Please select a location';
+			results.innerHTML += '<br/>------------------------------------- END REPORT -------------------------------------<br/><br/>';
 		}
 	});
 
@@ -55,10 +71,14 @@
 				let jsonResponse = await response.json();
 				console.log(jsonResponse);
 				if (jsonResponse.status === 1){
-					results.innerHTML = results.innerHTML+'Finished running scripts for location: '+jsonResponse.location+'<br/><br/>';
+					results.innerHTML += `
+						Finished running scripts for location:  ${jsonResponse.location}<br/><br/>
+						Transactions Processed: ${jsonResponse.transactionCount}
+						`;
 				} else {
-					results.innerHTML = results.innerHTML+'Error: '+jsonResponse.error;
+					results.innerHTML += `Error: ${jsonResponse.error}`;
 				}
+				results.innerHTML += '<br/>------------------------------------- END REPORT -------------------------------------<br/><br/>';
 				document.getElementById("form-submit").disabled = false;
 				return jsonResponse;
 			}

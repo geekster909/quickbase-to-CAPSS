@@ -10,7 +10,13 @@
 	}
 
 </style>
-
+<?php
+	date_default_timezone_set('UTC');
+	$timestamp = strtotime('yesterday midnight');
+	echo 'The day being processed is <strong>' . gmdate("m-d-Y", $timestamp) . '</strong>';
+?>
+<br/>
+<br/>
 <form id="location-form" method="post">
 	<select id="js-location">
 		<option value="">--Select Location--</option>
@@ -30,28 +36,35 @@
 	<button id="form-submit" type="submit">Submit</button>
 </form>
 <div>
+	Status: <span id="script-status">Ready</span>
+</div>
+<br/>
+<br/>
+<div>
 	Console:
-	<div id="results">
-	</div>
+	<div id="results"></div>
 </div>
 
 <script>
 	var locationForm = document.getElementById('location-form');
 	var results = document.getElementById('results');
-
+	var scriptStatus = document.getElementById('script-status');
+	console.log(scriptStatus);
 	locationForm.addEventListener('submit', function(e){
 		e.preventDefault();
 		var selectedOption = document.getElementById('js-location').value;
 
 		results.innerHTML += '----------------------------------- START REPORT -----------------------------------<br/>';
+		
+		
 
 		if (selectedOption != '') {
 			results.innerHTML += 'Running scripts for location: '+selectedOption+'<br/><br/>';
-			
-			document.getElementById("form-submit").disabled = true;
-			
+	
 			ajax(selectedOption);
 
+			scriptStatus.innerHTML = 'Loading...';
+			document.getElementById("form-submit").disabled = true;
 		} else {
 			results.innerHTML += 'Please select a location';
 			results.innerHTML += '<br/>------------------------------------- END REPORT -------------------------------------<br/><br/>';
@@ -85,7 +98,13 @@
 					results.innerHTML += `Error: ${jsonResponse.error}`;
 				}
 				results.innerHTML += '<br/>------------------------------------- END REPORT -------------------------------------<br/><br/>';
-				document.getElementById("form-submit").disabled = false;
+				scriptStatus.innerHTML = 'Please wait to submit again';
+				
+				setTimeout(function(){ 
+					scriptStatus.innerHTML = 'Ready';
+					document.getElementById("form-submit").disabled = false;
+				}, 3000);
+				
 				return jsonResponse;
 			}
 			throw new Error('Request failed!');

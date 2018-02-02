@@ -54,13 +54,14 @@ if ( !isset($location) ) {
 	// 26 - Full Name
 	// 46 - Date (in milliseconds)
 	// 42 - Time of Day (in milliseconds)
-	$transactionResults = $qbTransactions->do_query($transactionQueries, '', '', '3.26.46.42', '3', 'structured', 'sortorder-A');
+	// 33 - Employee
+	$transactionResults = $qbTransactions->do_query($transactionQueries, '', '', '3.26.46.42.33', '3', 'structured', 'sortorder-A');
 	$transactionResults = $transactionResults->table->records->record;
 
 	// return the count of how many transactions
 	$return_array['transactionCount'] = count($transactionResults);
 
-	//check if 
+	//check if there was 0 transactions and do not continue
 	if ($return_array['transactionCount'] === 0) {
 		$return_array['status'] = 0;
 		$return_array['error'] = 'No transactions to be proccessed';
@@ -68,10 +69,15 @@ if ( !isset($location) ) {
 		return;
 	}
 
+	// loop through every transaction that was placed for the day
 	foreach($transactionResults as $record) {
 		$record = json_decode(json_encode($record->f), true);
 
-
+		// set the variables for the results
+		$recordId = $record[0];
+		$customerFullName = $record[1];
+		$transactionDate = gmdate("m-d-Y", $record[2] / 1000);
+		$employeeFullName = $record[4];
 
 		// convert time of day from seconds to hours:mins:seconds
 		$record[3] = $record[3]/1000;
@@ -80,17 +86,18 @@ if ( !isset($location) ) {
 		$transactionTimeOfDay = sprintf('%02d:%02d', $hours, $mins);
 		$transactionTimeOfDay = date('h:i A', strtotime($transactionTimeOfDay));
 
+		// set the transaction info array
 		$transactionInfo = array(
-			'recordId' => $record[0],
-			'customerFullName' => $record[1],
-			'transactionDate' => gmdate("m-d-Y", $record[2] / 1000),
+			'recordId' => $recordId,
+			'customerFullName' => $customerFullName,
+			'transactionDate' => $transactionDate,
 			'transactionTime' => $transactionTimeOfDay,
 		);
 
 		// create the object for the CUSTOMERS table
 		$qbCustomers = new QuickBase($qbUser, $qbPassword, $qbUserToken, true, $qbDbTables['customers'], $qbAppToken, $qbRealm, '');
 		
-		// do the query in the CUSTOMERS table
+		// set the queries for the CUSTOMERS table
 		$customersQueries = array(
 			array(
 				'fid'  => '31',
@@ -99,17 +106,21 @@ if ( !isset($location) ) {
 			)
 		);
 
+		// do the query in the CUSTOMERS table
 		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62', '', 'structured', 'sortorder-A');
 		$customerResults = $customerResults->table->records->record->f;
 		$customerResults = json_decode(json_encode($customerResults), true);
 
+		// set a default hair color if there is not one
 		$hairColorOptions = array ('Bald', 'Black', 'Blond', 'Brown', 'Gray', 'Red', 'Sandy', 'White');
 		$hairColor = in_array($customerResults[8],$hairColorOptions) ? $customerResults[8] : 'Brown';
 
+		// set a default eye color if there is not one
 		$eyeColorOptions = array ('Black', 'Blue', 'Brown', 'Gray', 'Hazel', 'Pink', 'Green', 'Multi Color', 'Unknown');
 		$eyeColor = in_array($customerResults[9],$eyeColorOptions) ? $customerResults[9] : 'Brown';
 
-		$transactionInfo['customer'] = array(
+		// set the customer information for the transaction
+		$transactionInfo['customerInfo'] = array(
 			'firstName' => $customerResults[0],
 			'lastName' => $customerResults[1],
 			'dob' => gmdate("m-d-Y", $customerResults[2] / 1000),
@@ -125,6 +136,12 @@ if ( !isset($location) ) {
 			'weight' => $customerResults[12],
 			'identificationType' => $customerResults[13],
 			'idNumber' => $customerResults[14],
+		);
+
+		//set the store info for the transaction
+
+		$transactionInfo['storeInfo'] = array(
+			'employeeName' => $employeeFullName
 		);
 
 

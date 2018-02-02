@@ -85,7 +85,7 @@
 				console.log(jsonResponse);
 				if (jsonResponse.status === 1){
 					results.innerHTML += `
-						Finished running scripts for location:  ${jsonResponse.location}<br/><br/>
+						Finished running scripts for location: ${jsonResponse.location}<br/><br/>
 						Number of transactions processed: ${jsonResponse.transactionCount}<br/>
 						`;
 					

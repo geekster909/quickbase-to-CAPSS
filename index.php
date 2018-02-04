@@ -89,11 +89,12 @@
 						Number of transactions processed: ${jsonResponse.transactionCount}<br/>
 						`;
 					
-					for (var transaction in jsonResponse.transactions) {
+					Object.keys(jsonResponse.transactions).map((index) => {
+						const transaction = jsonResponse.transactions[index];
 						results.innerHTML += `
-							Processed transaction: ${transaction}<br/>
+							Processed transaction: <a href="${transaction.xmlPath}/${transaction.recordId}.xml" download>${transaction.recordId}</a><br/>
 						`;
-					}
+					});
 				} else {
 					results.innerHTML += `Error: ${jsonResponse.error}`;
 				}

@@ -3,6 +3,7 @@
 date_default_timezone_set('UTC');
 $postData = json_decode(file_get_contents('php://input'));
 $location = $postData->location;
+$locationCity = str_replace(' ', '_', substr($location, 0, strpos($location, ',')));
 $timestamp = (strtotime('yesterday midnight')*1000);
 
 include_once('settings.php');// include the account info variables
@@ -77,7 +78,7 @@ if ( !isset($location) ) {
 		$recordId = $record[0];
 		$customerFullName = $record[1];
 		$transactionDateSeconds = $record[2] / 1000;
-		$transactionDate = gmdate("m-d-Y", $transactionDateSeconds);
+		$transactionDate = gmdate("Y-m-d", $transactionDateSeconds);
 		$employeeFullName = $record[4];
 
 		// convert time of day from seconds to hours:mins:seconds
@@ -93,6 +94,7 @@ if ( !isset($location) ) {
 			'customerFullName' => $customerFullName,
 			'transactionDate' => $transactionDate,
 			'transactionTime' => $transactionTimeOfDay,
+			'xmlPath' => 'xml/'.gmdate("Y", $transactionDateSeconds).'/'.gmdate("m", $transactionDateSeconds).'/'.gmdate("d", $transactionDateSeconds).'/'.$locationCity
 		);
 
 		// create the object for the CUSTOMERS table
@@ -164,13 +166,13 @@ if ( !isset($location) ) {
 		$xmlDoc->formatOutput = true;
 		// print_r($xmlDoc->saveXML());die();
 
-		$filePath = 'xml/'.gmdate("Y", $transactionDateSeconds).'/'.gmdate("m", $transactionDateSeconds).'/'.gmdate("d", $transactionDateSeconds);
+		
 
-		if (!file_exists($filePath)) {
-	    	mkdir($filePath, 0777, true);
+		if (!file_exists($transactionInfo['xmlPath'])) {
+	    	mkdir($transactionInfo['xmlPath'], 0777, true);
 		}
 
-		$xmlDoc->save($filePath."/".$transactionInfo['recordId'].".xml");
+		$xmlDoc->save($transactionInfo['xmlPath']."/".$transactionInfo['recordId'].".xml");
 		// if ($xmlDoc->save($filePath."/".$recordInfo['recordId'].".xml")) {
 		// 	echo 'Saved Record ID '.$recordInfo['recordId'].' to '.$filePath.'<br/><br/>';
 		// } else {
@@ -261,7 +263,7 @@ function create_xml($transactionInfo) {
     	$xmlDoc->createElement("propertyTransaction"));
 
 	$transactionTime = $propertyTransaction->appendChild(
-    	$xmlDoc->createElement("transactionTime", gmdate('Y-m-d', $transactionInfo['transactionDate']).'T'.$transactionInfo['transactionTime']));
+    	$xmlDoc->createElement("transactionTime", $transactionInfo['transactionDate'].'T'.$transactionInfo['transactionTime']));
 
 	$customer = $propertyTransaction->appendChild(
     	$xmlDoc->createElement("customer"));

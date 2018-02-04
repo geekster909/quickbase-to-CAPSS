@@ -270,52 +270,78 @@ function create_xml($transactionInfo) {
 			$xmlDoc->createElement("transactionTime", $transactionInfo['transactionDate'].'T'.$transactionInfo['transactionTime']));
 		$customer = $propertyTransaction->appendChild(
 			$xmlDoc->createElement("customer"));
-		$custLastName = $customer->appendChild(
-			$xmlDoc->createElement("custLastName", $transactionInfo['customerInfo']['lastName']));
-		$custFirstName = $customer->appendChild(
-			$xmlDoc->createElement("custFirstName", $transactionInfo['customerInfo']['firstName']));
-		$gender = $customer->appendChild(
-			$xmlDoc->createElement("gender", $transactionInfo['customerInfo']['gender']));
-		$hairColor = $customer->appendChild(
-			$xmlDoc->createElement("hairColor", $transactionInfo['customerInfo']['hairColor']));
-		$eyeColor = $customer->appendChild(
-			$xmlDoc->createElement("eyeColor", $transactionInfo['customerInfo']['eyeColor']));
-		$height = $customer->appendChild(
-			$xmlDoc->createElement("height", $transactionInfo['customerInfo']['height']));
-		$weight = $customer->appendChild(
-			$xmlDoc->createElement("weight", $transactionInfo['customerInfo']['weight']));
-		$dateOfBirth = $customer->appendChild(
-			$xmlDoc->createElement("dateOfBirth", $transactionInfo['customerInfo']['dob']));
-		$streetAddress = $customer->appendChild(
-			$xmlDoc->createElement("streetAddress", $transactionInfo['customerInfo']['address']));
-		$city = $customer->appendChild(
-			$xmlDoc->createElement("city", $transactionInfo['customerInfo']['city']));
-		$state = $customer->appendChild(
-			$xmlDoc->createElement("state", $transactionInfo['customerInfo']['state']));
-		$postalCode = $customer->appendChild(
-			$xmlDoc->createElement("postalCode", $transactionInfo['customerInfo']['postalCode']));
-		$phoneNumber = $customer->appendChild(
-			$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
-		$id = $customer->appendChild(
-			$xmlDoc->createElement("id"));
-			$idType = $id->appendChild(
-				$xmlDoc->createElement("type", $transactionInfo['customerInfo']['idType']));
-			$idNumber = $id->appendChild(
-				$xmlDoc->createElement("number", $transactionInfo['customerInfo']['idNumber']));
-			$idDateOfIssue = $id->appendChild(
-				$xmlDoc->createElement("dateOfIssue", $transactionInfo['customerInfo']['idDateOfIssue']));
-			$idIssueState= $id->appendChild(
-				$xmlDoc->createElement("issueState", $transactionInfo['customerInfo']['idIssueState']));
-			$idIssueCountry= $id->appendChild(
-				$xmlDoc->createElement("issueCountry", $transactionInfo['customerInfo']['idIssueCountry']));
-			$idYearOfExpiration = $id->appendChild(
-				$xmlDoc->createElement("yearOfExpiration", $transactionInfo['customerInfo']['idYearOfExpiration']));
-		$customerSignature = $customer->appendChild(
-			$xmlDoc->createElement("signature", $transactionInfo['customerInfo']['customerSignature']));
-		$customerThumbprint = $customer->appendChild(
-			$xmlDoc->createElement("thumbprint", $transactionInfo['customerInfo']['customerThumbprint']));
+			$custLastName = $customer->appendChild(
+				$xmlDoc->createElement("custLastName", $transactionInfo['customerInfo']['lastName']));
+			$custFirstName = $customer->appendChild(
+				$xmlDoc->createElement("custFirstName", $transactionInfo['customerInfo']['firstName']));
+			$gender = $customer->appendChild(
+				$xmlDoc->createElement("gender", $transactionInfo['customerInfo']['gender']));
+			$hairColor = $customer->appendChild(
+				$xmlDoc->createElement("hairColor", $transactionInfo['customerInfo']['hairColor']));
+			$eyeColor = $customer->appendChild(
+				$xmlDoc->createElement("eyeColor", $transactionInfo['customerInfo']['eyeColor']));
+			$height = $customer->appendChild(
+				$xmlDoc->createElement("height", $transactionInfo['customerInfo']['height']));
+			$weight = $customer->appendChild(
+				$xmlDoc->createElement("weight", $transactionInfo['customerInfo']['weight']));
+			$dateOfBirth = $customer->appendChild(
+				$xmlDoc->createElement("dateOfBirth", $transactionInfo['customerInfo']['dob']));
+			$streetAddress = $customer->appendChild(
+				$xmlDoc->createElement("streetAddress", $transactionInfo['customerInfo']['address']));
+			$city = $customer->appendChild(
+				$xmlDoc->createElement("city", $transactionInfo['customerInfo']['city']));
+			$state = $customer->appendChild(
+				$xmlDoc->createElement("state", $transactionInfo['customerInfo']['state']));
+			$postalCode = $customer->appendChild(
+				$xmlDoc->createElement("postalCode", $transactionInfo['customerInfo']['postalCode']));
+			$phoneNumber = $customer->appendChild(
+				$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
+			$id = $customer->appendChild(
+				$xmlDoc->createElement("id"));
+				$idType = $id->appendChild(
+					$xmlDoc->createElement("type", $transactionInfo['customerInfo']['idType']));
+				$idNumber = $id->appendChild(
+					$xmlDoc->createElement("number", $transactionInfo['customerInfo']['idNumber']));
+				$idDateOfIssue = $id->appendChild(
+					$xmlDoc->createElement("dateOfIssue", $transactionInfo['customerInfo']['idDateOfIssue']));
+				$idIssueState= $id->appendChild(
+					$xmlDoc->createElement("issueState", $transactionInfo['customerInfo']['idIssueState']));
+				$idIssueCountry= $id->appendChild(
+					$xmlDoc->createElement("issueCountry", $transactionInfo['customerInfo']['idIssueCountry']));
+				$idYearOfExpiration = $id->appendChild(
+					$xmlDoc->createElement("yearOfExpiration", $transactionInfo['customerInfo']['idYearOfExpiration']));
+			$customerSignature = $customer->appendChild(
+				$xmlDoc->createElement("signature", $transactionInfo['customerInfo']['customerSignature']));
+			$customerThumbprint = $customer->appendChild(
+				$xmlDoc->createElement("thumbprint", $transactionInfo['customerInfo']['customerThumbprint']));
+		$store = $propertyTransaction->appendChild(
+			$xmlDoc->createElement("store"));
+			$employeeFullName = $store->appendChild(
+				$xmlDoc->createElement("employeeName", $transactionInfo['store']['employeeFullName']));
+			$employeeSignature = $store->appendChild(
+				$xmlDoc->createElement("signature", $transactionInfo['store']['employeeSignature']));
+		$items = $propertyTransaction->appendChild(
+			$xmlDoc->createElement("items"));
 
-
-
+		// foreach ($items as $item) {
+			$item = $items->appendChild(
+				$xmlDoc->createElement("items"));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("referenceId", ''));
+				$itemType = $item->appendChild(
+					$xmlDoc->createElement("type", 'BUY'));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("loanBuyNumber", ''));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("amount", ''));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("article", ''));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("brand", ''));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("serialNumber", ''));
+				$itemReferenceId = $item->appendChild(
+					$xmlDoc->createElement("description", ''));
+		// }
 	return $xmlDoc;
 }

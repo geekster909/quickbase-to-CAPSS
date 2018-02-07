@@ -110,7 +110,7 @@ if ( !isset($location) ) {
 		);
 
 		// do the query in the CUSTOMERS table
-		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62', '', 'structured', 'sortorder-A');
+		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62.79.76.77.64', '', 'structured', 'sortorder-A');
 		$customerResults = $customerResults->table->records->record->f;
 		$customerResults = json_decode(json_encode($customerResults), true);
 
@@ -143,13 +143,23 @@ if ( !isset($location) ) {
 			'weight' => $weight,
 			'idType' => $customerResults[13],
 			'idNumber' => $customerResults[14],
-			'idDateOfIssue' => '',
-			'idIssueState' => '',
-			'idIssueCountry' => '',
-			'idYearOfExpiration' => '',
+			'idDateOfIssue' => gmdate("Y-m-d", $customerResults[15] / 1000),
+			'idIssueState' => $customerResults[16],
+			'idIssueCountry' => $customerResults[17],
+			'idYearOfExpiration' => $customerResults[18],
 			'customerSignature' => '',
 			'customerThumbprint' => '',
 		);
+
+		// Loop through Customer Info to make sure there are values
+		foreach($transactionInfo['customerInfo'] as $key => $value) {
+			if (is_array($value)) {
+				$return_array['status'] = 0;
+				$return_array['error'] = 'Customer Field "'.$key.'" has no value for Record ' . $transactionInfo['recordId'];
+				echo json_encode($return_array);
+				return;
+			}
+		}
 
 		//set the store info for the transaction
 

@@ -86,7 +86,7 @@ if ( !isset($location) ) {
 		$hours = floor($record[3] / 3600);
 		$mins = floor($record[3] / 60 % 60);
 		$transactionTimeOfDay = sprintf('%02d:%02d', $hours, $mins);
-		$transactionTimeOfDay = date('h:i A', strtotime($transactionTimeOfDay));
+		$transactionTimeOfDay = date('h:i:s', strtotime($transactionTimeOfDay));
 
 		// set the transaction info array
 		$transactionInfo = array(
@@ -110,7 +110,7 @@ if ( !isset($location) ) {
 		);
 
 		// do the query in the CUSTOMERS table
-		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62.79.76.77.64', '', 'structured', 'sortorder-A');
+		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62.79.76.77.64.81.80', '', 'structured', 'sortorder-A');
 		$customerResults = $customerResults->table->records->record->f;
 		$customerResults = json_decode(json_encode($customerResults), true);
 
@@ -131,7 +131,7 @@ if ( !isset($location) ) {
 		$transactionInfo['customerInfo'] = array(
 			'firstName' => $customerResults[0],
 			'lastName' => $customerResults[1],
-			'dob' => gmdate("Y-m-d", $customerResults[2] / 1000),
+			'dob' => $customerResults[2],
 			'address' => $customerResults[3],
 			'city' => $customerResults[4],
 			'state' => $customerResults[5],
@@ -143,13 +143,14 @@ if ( !isset($location) ) {
 			'weight' => $weight,
 			'idType' => $customerResults[13],
 			'idNumber' => $customerResults[14],
-			'idDateOfIssue' => gmdate("Y-m-d", $customerResults[15] / 1000),
+			'idDateOfIssue' => $customerResults[15],
 			'idIssueState' => $customerResults[16],
 			'idIssueCountry' => $customerResults[17],
 			'idYearOfExpiration' => $customerResults[18],
-			'customerSignature' => '',
-			'customerThumbprint' => '',
+			// 'customerSignature' => $customerResults[19],
+			// 'customerThumbprint' => $customerResults[20],
 		);
+		// echo '<pre>'; print_r($transactionInfo['customerInfo']); echo '</pre>';die('here');
 
 		// Loop through Customer Info to make sure there are values
 		foreach($transactionInfo['customerInfo'] as $key => $value) {
@@ -160,6 +161,13 @@ if ( !isset($location) ) {
 				return;
 			}
 		}
+
+		// convert customer information
+		$transactionInfo['customerInfo']['dob'] = gmdate("Y-m-d", $transactionInfo['customerInfo']['dob'] / 1000);
+		$transactionInfo['customerInfo']['idDateOfIssue'] = gmdate("Y-m-d", $transactionInfo['customerInfo']['idDateOfIssue'] / 1000);
+		// $transactionInfo['customerInfo']['customerSignature'] = base64_encode(file_get_contents($transactionInfo['customerInfo']['customerSignature']));
+		// $transactionInfo['customerInfo']['customerThumbprint'] = base64_encode(file_get_contents($transactionInfo['customerInfo']['customerThumbprint']));
+		// echo '<pre>'; print_r($transactionInfo['customerInfo']); echo '</pre>';die('here');
 
 		//set the store info for the transaction
 
@@ -272,7 +280,7 @@ function create_xml($transactionInfo) {
 		$xmlDoc->createElement("bulkUploadData"));
 	$bulkUploadData->appendChild(
 		$xmlDoc->createAttribute("licenseNumber"))->appendChild(
-			$xmlDoc->createTextNode("01081001"));
+			$xmlDoc->createTextNode("33131099"));
 
 	$propertyTransaction = $bulkUploadData->appendChild(
 		$xmlDoc->createElement("propertyTransaction"));
@@ -326,16 +334,16 @@ function create_xml($transactionInfo) {
 				$xmlDoc->createElement("thumbprint", $transactionInfo['customerInfo']['customerThumbprint']));
 		$store = $propertyTransaction->appendChild(
 			$xmlDoc->createElement("store"));
-			$employeeFullName = $store->appendChild(
-				$xmlDoc->createElement("employeeName", $transactionInfo['store']['employeeFullName']));
+			$employeeName = $store->appendChild(
+				$xmlDoc->createElement("employeeName", $transactionInfo['storeInfo']['employeeName']));
 			$employeeSignature = $store->appendChild(
-				$xmlDoc->createElement("signature", $transactionInfo['store']['employeeSignature']));
+				$xmlDoc->createElement("signature", $transactionInfo['storeInfo']['employeeSignature']));
 		$items = $propertyTransaction->appendChild(
 			$xmlDoc->createElement("items"));
 
 		// foreach ($items as $item) {
 			$item = $items->appendChild(
-				$xmlDoc->createElement("items"));
+				$xmlDoc->createElement("item"));
 				$itemReferenceId = $item->appendChild(
 					$xmlDoc->createElement("referenceId", ''));
 				$itemType = $item->appendChild(

@@ -70,6 +70,32 @@ if ( !isset($location) ) {
 		return;
 	}
 
+	// create the object for the CUSTOMERS table
+	$qbLocations = new QuickBase($qbUser, $qbPassword, $qbUserToken, true, $qbDbTables['locations'], $qbAppToken, $qbRealm, '');
+	
+	// set the queries for the CUSTOMERS table
+	$locationsQueries = array(
+		array(
+			'fid'  => '20',
+			'ev'   => 'EX',
+			'cri'  => $location
+		)
+	);
+
+	// do the query in the CUSTOMERS table
+	$locationResults = $qbLocations->do_query($locationsQueries, '', '', '62', '', 'structured', 'sortorder-A');
+	$locationResults = $locationResults->table->records->record->f;
+	$locationResults = json_decode(json_encode($locationResults), true);
+	$return_array['location_license'] = $locationResults[0];
+
+	//check if there is a license number and do not continue
+	if (is_null($return_array['location_license'])) {
+		$return_array['status'] = 0;
+		$return_array['error'] = 'No location license number';
+		echo json_encode($return_array);
+		return;
+	}
+
 	// loop through every transaction that was placed for the day
 	foreach($transactionResults as $record) {
 		$record = json_decode(json_encode($record->f), true);

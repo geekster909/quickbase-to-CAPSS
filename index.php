@@ -86,15 +86,20 @@
 				if (jsonResponse.status === 1){
 					results.innerHTML += `
 						Finished running scripts for location: ${jsonResponse.location}<br/><br/>
-						Number of transactions processed: ${jsonResponse.transactionCount}<br/>
+						Number of transactions processed: ${jsonResponse.transactionCount}<br/><br/>
 						`;
 					
 					Object.keys(jsonResponse.transactions).map((index) => {
 						const transaction = jsonResponse.transactions[index];
 						results.innerHTML += `
-							Processed transaction: <a href="${transaction.xmlPath}/${transaction.recordId}.xml" download>${transaction.recordId}</a><br/>
+							Processed transaction: ${transaction.recordId}<br/>
 						`;
 					});
+
+					results.innerHTML += `
+						<br/>
+						Download .xml for location ${jsonResponse.locationCity} <a href="${jsonResponse.xmlPath}/${jsonResponse.locationCity}.xml" download>HERE</a>
+					`;
 				} else {
 					results.innerHTML += `Error: ${jsonResponse.error}`;
 				}

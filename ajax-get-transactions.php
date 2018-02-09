@@ -4,7 +4,8 @@ date_default_timezone_set('UTC');
 $postData = json_decode(file_get_contents('php://input'));
 $location = $postData->location;
 $locationCity = str_replace(' ', '_', substr($location, 0, strpos($location, ',')));
-$timestamp = (strtotime('yesterday midnight')*1000);
+$yesterdayMidnight = strtotime('yesterday midnight');
+$timestamp = ($yesterdayMidnight*1000);
 
 include_once('settings.php');// include the account info variables
 include_once('quickbase.php');//include the api file
@@ -18,6 +19,8 @@ if ( !isset($location) ) {
 	$return_array = array(
 		'status' => 1,
 		'location' => $location,
+		'locationCity' => $locationCity,
+		'xmlPath' => 'xml/'.gmdate("Y", $yesterdayMidnight).'/'.gmdate("m", $yesterdayMidnight).'/'.gmdate("d", $yesterdayMidnight),
 		'timestamp' => array(
 			'milliseconds' => $timestamp,
 			'date' => gmdate("m-d-Y", $timestamp / 1000)
@@ -34,7 +37,7 @@ if ( !isset($location) ) {
 		array(
 			'fid'  => '46', // Feild ID
 			'ev'   => 'EX', // Exact
-			'cri'  => (strtotime('yesterday midnight')*1000) // criteria
+			'cri'  => ($yesterdayMidnight*1000) // criteria
 		),
 		array(
 			'ao'  => 'AND',//OR is also acceptable
@@ -120,7 +123,7 @@ if ( !isset($location) ) {
 			'customerFullName' => $customerFullName,
 			'transactionDate' => $transactionDate,
 			'transactionTime' => $transactionTimeOfDay,
-			'xmlPath' => 'xml/'.gmdate("Y", $transactionDateSeconds).'/'.gmdate("m", $transactionDateSeconds).'/'.gmdate("d", $transactionDateSeconds).'/'.$locationCity
+			'xmlPath' => 'xml/'.gmdate("Y", $transactionDateSeconds).'/'.gmdate("m", $transactionDateSeconds).'/'.gmdate("d", $transactionDateSeconds)
 		);
 
 		// create the object for the CUSTOMERS table
@@ -198,7 +201,6 @@ if ( !isset($location) ) {
 		// echo '<pre>'; print_r($transactionInfo['customerInfo']); echo '</pre>';die('here');
 
 		//set the store info for the transaction
-
 		$transactionInfo['storeInfo'] = array(
 			'employeeName' => $employeeFullName
 		);
@@ -212,25 +214,25 @@ if ( !isset($location) ) {
 
 
 		$return_array['transactions'][$transactionInfo['recordId']] = $transactionInfo;
-		$xmlDoc = create_xml($transactionInfo);
-		//make the output pretty
-		$xmlDoc->formatOutput = true;
-		// print_r($xmlDoc->saveXML());die();
-
-		
-
-		if (!file_exists($transactionInfo['xmlPath'])) {
-			mkdir($transactionInfo['xmlPath'], 0777, true);
-		}
-
-		$xmlDoc->save($transactionInfo['xmlPath']."/".$transactionInfo['recordId'].".xml");
-		// if ($xmlDoc->save($filePath."/".$recordInfo['recordId'].".xml")) {
-		// 	echo 'Saved Record ID '.$recordInfo['recordId'].' to '.$filePath.'<br/><br/>';
-		// } else {
-		// 	echo 'Did not save Record ID '.$recordInfo['recordId'].'<br/><br/>';
-		// }
 
 	}
+	$xmlDoc = create_xml($return_array);
+		//make the output pretty
+	$xmlDoc->formatOutput = true;
+	// print_r($xmlDoc->saveXML());die();
+
+	
+
+	if (!file_exists($transactionInfo['xmlPath'])) {
+		mkdir($transactionInfo['xmlPath'], 0777, true);
+	}
+
+	$xmlDoc->save($transactionInfo['xmlPath']."/".$locationCity.".xml");
+	// if ($xmlDoc->save($filePath."/".$recordInfo['recordId'].".xml")) {
+	// 	echo 'Saved Record ID '.$recordInfo['recordId'].' to '.$filePath.'<br/><br/>';
+	// } else {
+	// 	echo 'Did not save Record ID '.$recordInfo['recordId'].'<br/><br/>';
+	// }
 }
 
 
@@ -238,7 +240,7 @@ echo json_encode($return_array);
 return;
 
 
-function create_xml($transactionInfo) {
+function create_xml($return_array) {
 	// header("Content-Type: text/plain");
 
 	/*
@@ -310,84 +312,87 @@ function create_xml($transactionInfo) {
 	$bulkUploadData->appendChild(
 		$xmlDoc->createAttribute("licenseNumber"))->appendChild(
 			$xmlDoc->createTextNode("33131099"));
+		//$return_array['location_license']
 
-	$propertyTransaction = $bulkUploadData->appendChild(
-		$xmlDoc->createElement("propertyTransaction"));
-		$transactionTime = $propertyTransaction->appendChild(
-			$xmlDoc->createElement("transactionTime", $transactionInfo['transactionDate'].'T'.$transactionInfo['transactionTime']));
-		$customer = $propertyTransaction->appendChild(
-			$xmlDoc->createElement("customer"));
-			$custLastName = $customer->appendChild(
-				$xmlDoc->createElement("custLastName", $transactionInfo['customerInfo']['lastName']));
-			$custFirstName = $customer->appendChild(
-				$xmlDoc->createElement("custFirstName", $transactionInfo['customerInfo']['firstName']));
-			$gender = $customer->appendChild(
-				$xmlDoc->createElement("gender", $transactionInfo['customerInfo']['gender']));
-			$hairColor = $customer->appendChild(
-				$xmlDoc->createElement("hairColor", $transactionInfo['customerInfo']['hairColor']));
-			$eyeColor = $customer->appendChild(
-				$xmlDoc->createElement("eyeColor", $transactionInfo['customerInfo']['eyeColor']));
-			$height = $customer->appendChild(
-				$xmlDoc->createElement("height", $transactionInfo['customerInfo']['height']));
-			$weight = $customer->appendChild(
-				$xmlDoc->createElement("weight", $transactionInfo['customerInfo']['weight']));
-			$dateOfBirth = $customer->appendChild(
-				$xmlDoc->createElement("dateOfBirth", $transactionInfo['customerInfo']['dob']));
-			$streetAddress = $customer->appendChild(
-				$xmlDoc->createElement("streetAddress", $transactionInfo['customerInfo']['address']));
-			$city = $customer->appendChild(
-				$xmlDoc->createElement("city", $transactionInfo['customerInfo']['city']));
-			$state = $customer->appendChild(
-				$xmlDoc->createElement("state", $transactionInfo['customerInfo']['state']));
-			$postalCode = $customer->appendChild(
-				$xmlDoc->createElement("postalCode", $transactionInfo['customerInfo']['postalCode']));
-			$phoneNumber = $customer->appendChild(
-				$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
-			$id = $customer->appendChild(
-				$xmlDoc->createElement("id"));
-				$idType = $id->appendChild(
-					$xmlDoc->createElement("type", $transactionInfo['customerInfo']['idType']));
-				$idNumber = $id->appendChild(
-					$xmlDoc->createElement("number", $transactionInfo['customerInfo']['idNumber']));
-				$idDateOfIssue = $id->appendChild(
-					$xmlDoc->createElement("dateOfIssue", $transactionInfo['customerInfo']['idDateOfIssue']));
-				$idIssueState= $id->appendChild(
-					$xmlDoc->createElement("issueState", $transactionInfo['customerInfo']['idIssueState']));
-				$idIssueCountry= $id->appendChild(
-					$xmlDoc->createElement("issueCountry", $transactionInfo['customerInfo']['idIssueCountry']));
-				$idYearOfExpiration = $id->appendChild(
-					$xmlDoc->createElement("yearOfExpiration", $transactionInfo['customerInfo']['idYearOfExpiration']));
-			$customerSignature = $customer->appendChild(
-				$xmlDoc->createElement("signature", $transactionInfo['customerInfo']['customerSignature']));
-			$customerThumbprint = $customer->appendChild(
-				$xmlDoc->createElement("thumbprint", $transactionInfo['customerInfo']['customerThumbprint']));
-		$store = $propertyTransaction->appendChild(
-			$xmlDoc->createElement("store"));
-			$employeeName = $store->appendChild(
-				$xmlDoc->createElement("employeeName", $transactionInfo['storeInfo']['employeeName']));
-			$employeeSignature = $store->appendChild(
-				$xmlDoc->createElement("signature", $transactionInfo['storeInfo']['employeeSignature']));
-		$items = $propertyTransaction->appendChild(
-			$xmlDoc->createElement("items"));
+	foreach ($return_array['transactions'] as $transactionInfo) {
+		$propertyTransaction = $bulkUploadData->appendChild(
+			$xmlDoc->createElement("propertyTransaction"));
+			$transactionTime = $propertyTransaction->appendChild(
+				$xmlDoc->createElement("transactionTime", $transactionInfo['transactionDate'].'T'.$transactionInfo['transactionTime']));
+			$customer = $propertyTransaction->appendChild(
+				$xmlDoc->createElement("customer"));
+				$custLastName = $customer->appendChild(
+					$xmlDoc->createElement("custLastName", $transactionInfo['customerInfo']['lastName']));
+				$custFirstName = $customer->appendChild(
+					$xmlDoc->createElement("custFirstName", $transactionInfo['customerInfo']['firstName']));
+				$gender = $customer->appendChild(
+					$xmlDoc->createElement("gender", $transactionInfo['customerInfo']['gender']));
+				$hairColor = $customer->appendChild(
+					$xmlDoc->createElement("hairColor", $transactionInfo['customerInfo']['hairColor']));
+				$eyeColor = $customer->appendChild(
+					$xmlDoc->createElement("eyeColor", $transactionInfo['customerInfo']['eyeColor']));
+				$height = $customer->appendChild(
+					$xmlDoc->createElement("height", $transactionInfo['customerInfo']['height']));
+				$weight = $customer->appendChild(
+					$xmlDoc->createElement("weight", $transactionInfo['customerInfo']['weight']));
+				$dateOfBirth = $customer->appendChild(
+					$xmlDoc->createElement("dateOfBirth", $transactionInfo['customerInfo']['dob']));
+				$streetAddress = $customer->appendChild(
+					$xmlDoc->createElement("streetAddress", $transactionInfo['customerInfo']['address']));
+				$city = $customer->appendChild(
+					$xmlDoc->createElement("city", $transactionInfo['customerInfo']['city']));
+				$state = $customer->appendChild(
+					$xmlDoc->createElement("state", $transactionInfo['customerInfo']['state']));
+				$postalCode = $customer->appendChild(
+					$xmlDoc->createElement("postalCode", $transactionInfo['customerInfo']['postalCode']));
+				$phoneNumber = $customer->appendChild(
+					$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
+				$id = $customer->appendChild(
+					$xmlDoc->createElement("id"));
+					$idType = $id->appendChild(
+						$xmlDoc->createElement("type", $transactionInfo['customerInfo']['idType']));
+					$idNumber = $id->appendChild(
+						$xmlDoc->createElement("number", $transactionInfo['customerInfo']['idNumber']));
+					$idDateOfIssue = $id->appendChild(
+						$xmlDoc->createElement("dateOfIssue", $transactionInfo['customerInfo']['idDateOfIssue']));
+					$idIssueState= $id->appendChild(
+						$xmlDoc->createElement("issueState", $transactionInfo['customerInfo']['idIssueState']));
+					$idIssueCountry= $id->appendChild(
+						$xmlDoc->createElement("issueCountry", $transactionInfo['customerInfo']['idIssueCountry']));
+					$idYearOfExpiration = $id->appendChild(
+						$xmlDoc->createElement("yearOfExpiration", $transactionInfo['customerInfo']['idYearOfExpiration']));
+				$customerSignature = $customer->appendChild(
+					$xmlDoc->createElement("signature", $transactionInfo['customerInfo']['customerSignature']));
+				$customerThumbprint = $customer->appendChild(
+					$xmlDoc->createElement("thumbprint", $transactionInfo['customerInfo']['customerThumbprint']));
+			$store = $propertyTransaction->appendChild(
+				$xmlDoc->createElement("store"));
+				$employeeName = $store->appendChild(
+					$xmlDoc->createElement("employeeName", $transactionInfo['storeInfo']['employeeName']));
+				$employeeSignature = $store->appendChild(
+					$xmlDoc->createElement("signature", $transactionInfo['storeInfo']['employeeSignature']));
+			$items = $propertyTransaction->appendChild(
+				$xmlDoc->createElement("items"));
 
-		// foreach ($items as $item) {
-			$item = $items->appendChild(
-				$xmlDoc->createElement("item"));
-				$itemType = $item->appendChild(
-					$xmlDoc->createElement("type", 'BUY'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("loanBuyNumber", '1234'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("amount", '713.00'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("article", 'WATCH'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("brand", 'ROLEX'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("serialNumber", '123U601945'));
-				$itemReferenceId = $item->appendChild(
-					$xmlDoc->createElement("description", 'S G ENGRAVED ON BACK,COLOR-GOLDEN,VALUE$10,000'));
+			// foreach ($items as $item) {
+				$item = $items->appendChild(
+					$xmlDoc->createElement("item"));
+					$itemType = $item->appendChild(
+						$xmlDoc->createElement("type", 'BUY'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("loanBuyNumber", '1234'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("amount", '713.00'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("article", 'WATCH'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("brand", 'ROLEX'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("serialNumber", '123U601945'));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("description", 'S G ENGRAVED ON BACK,COLOR-GOLDEN,VALUE$10,000'));
 
-		// }
+			// }
+	}
 	return $xmlDoc;
 }

@@ -59,7 +59,8 @@ if ( !isset($location) ) {
 	// 46 - Date (in milliseconds)
 	// 42 - Time of Day (in milliseconds)
 	// 33 - Employee
-	$transactionResults = $qbTransactions->do_query($transactionQueries, '', '', '3.26.46.42.33', '3', 'structured', 'sortorder-A');
+	// 16 - Customer Address
+	$transactionResults = $qbTransactions->do_query($transactionQueries, '', '', '3.26.46.42.33.16', '3', 'structured', 'sortorder-A');
 	$transactionResults = $transactionResults->table->records->record;
 
 	// return the count of how many transactions
@@ -73,10 +74,10 @@ if ( !isset($location) ) {
 		return;
 	}
 
-	// create the object for the CUSTOMERS table
+	// create the object for the LOCATIONS table
 	$qbLocations = new QuickBase($qbUser, $qbPassword, $qbUserToken, true, $qbDbTables['locations'], $qbAppToken, $qbRealm, '');
 	
-	// set the queries for the CUSTOMERS table
+	// set the queries for the LOCATIONS table
 	$locationsQueries = array(
 		array(
 			'fid'  => '20',
@@ -85,7 +86,7 @@ if ( !isset($location) ) {
 		)
 	);
 
-	// do the query in the CUSTOMERS table
+	// do the query in the LOCATIONS table
 	$locationResults = $qbLocations->do_query($locationsQueries, '', '', '62', '', 'structured', 'sortorder-A');
 	$locationResults = $locationResults->table->records->record->f;
 	$locationResults = json_decode(json_encode($locationResults), true);
@@ -106,6 +107,7 @@ if ( !isset($location) ) {
 		// set the variables for the results
 		$recordId = $record[0];
 		$customerFullName = $record[1];
+		$customerAddress = $record[5];
 		$transactionDateSeconds = $record[2] / 1000;
 		$transactionDate = gmdate("Y-m-d", $transactionDateSeconds);
 		$employeeFullName = $record[4];
@@ -121,6 +123,7 @@ if ( !isset($location) ) {
 		$transactionInfo = array(
 			'recordId' => $recordId,
 			'customerFullName' => $customerFullName,
+			'customerAddress' => $customerAddress,
 			'transactionDate' => $transactionDate,
 			'transactionTime' => $transactionTimeOfDay,
 			'xmlPath' => 'xml/'.gmdate("Y", $transactionDateSeconds).'/'.gmdate("m", $transactionDateSeconds).'/'.gmdate("d", $transactionDateSeconds)
@@ -135,6 +138,12 @@ if ( !isset($location) ) {
 				'fid'  => '31',
 				'ev'   => 'EX',
 				'cri'  => $transactionInfo['customerFullName']
+			),
+			array(
+				'ao'  => 'AND',//OR is also acceptable
+				'fid' => '8',
+				'ev'  => 'EX',
+				'cri' => $transactionInfo['customerAddress']
 			)
 		);
 
@@ -142,6 +151,7 @@ if ( !isset($location) ) {
 		$customerResults = $qbCustomers->do_query($customersQueries, '', '', '6.7.35.8.9.10.11.14.70.71.72.73.74.75.62.79.76.77.64.81.80', '', 'structured', 'sortorder-A');
 		$customerResults = $customerResults->table->records->record->f;
 		$customerResults = json_decode(json_encode($customerResults), true);
+		// echo '<pre>'; print_r($customerResults); echo '</pre>';die('here');
 
 		// set a default hair color if there is not one
 		$hairColorOptions = array ('Bald', 'Black', 'Blond', 'Brown', 'Gray', 'Red', 'Sandy', 'White');
@@ -216,6 +226,8 @@ if ( !isset($location) ) {
 		$return_array['transactions'][$transactionInfo['recordId']] = $transactionInfo;
 
 	}
+	
+	// echo '<pre>'; print_r($return_array); echo '</pre>';die('here');
 	$xmlDoc = create_xml($return_array);
 		//make the output pretty
 	$xmlDoc->formatOutput = true;

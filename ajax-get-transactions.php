@@ -233,6 +233,15 @@ if ( !isset($location) ) {
 		$itemResults = $qbItems->do_query($itemsQueries, '', '', '6.7.8.9.10.11', '', 'structured', 'sortorder-A');
 		$itemResults = $itemResults->table->records->record;
 		// echo '<pre>'; print_r(count($itemResults)); echo '</pre>';die('here');
+
+		//check if there is a license number and do not continue
+		if (count($itemResults)=== 0) {
+			$return_array['status'] = 0;
+			$return_array['error'] = 'There are no items for Record ' . $transactionInfo['recordId'];
+			echo json_encode($return_array);
+			return;
+		}
+
 		$i = 0;
 		foreach ($itemResults as $key => $value) {
 			$item = json_decode(json_encode($value->f), true);

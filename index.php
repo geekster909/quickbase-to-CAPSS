@@ -13,6 +13,7 @@
 <?php
 	date_default_timezone_set('UTC');
 	$timestamp = strtotime('yesterday midnight');
+	// $timestamp = strtotime('-2 days', strtotime('yesterday midnight'));
 	echo 'The day being processed is <strong>' . gmdate("m-d-Y", $timestamp) . '</strong>';
 ?>
 <br/>

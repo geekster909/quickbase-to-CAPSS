@@ -5,6 +5,7 @@ $postData = json_decode(file_get_contents('php://input'));
 $location = $postData->location;
 $locationCity = str_replace(' ', '_', substr($location, 0, strpos($location, ',')));
 $yesterdayMidnight = strtotime('yesterday midnight');
+// $yesterdayMidnight = strtotime('-2 days', strtotime('yesterday midnight'));
 $timestamp = ($yesterdayMidnight*1000);
 
 include_once('settings.php');// include the account info variables
@@ -62,6 +63,7 @@ if ( !isset($location) ) {
 	// 16 - Customer Address
 	$transactionResults = $qbTransactions->do_query($transactionQueries, '', '', '3.26.46.42.33.16', '3', 'structured', 'sortorder-A');
 	$transactionResults = $transactionResults->table->records->record;
+	// echo '<pre>'; print_r($transactionResults); echo '</pre>';die('here');
 
 	// return the count of how many transactions
 	$return_array['transactionCount'] = count($transactionResults);
@@ -215,8 +217,38 @@ if ( !isset($location) ) {
 			'employeeName' => $employeeFullName
 		);
 
+		// create the object for the ITEMS table
+		$qbItems = new QuickBase($qbUser, $qbPassword, $qbUserToken, true, $qbDbTables['items'], $qbAppToken, $qbRealm, '');
+		
+		// set the queries for the ITEMS table
+		$itemsQueries = array(
+			array(
+				'fid'  => '18',
+				'ev'   => 'EX',
+				'cri'  => $transactionInfo['recordId']
+			)
+		);
 
+		// do the query in the ITEMS table
+		$itemResults = $qbItems->do_query($itemsQueries, '', '', '6.7.8.9.10.11', '', 'structured', 'sortorder-A');
+		$itemResults = $itemResults->table->records->record;
+		// echo '<pre>'; print_r(count($itemResults)); echo '</pre>';die('here');
+		$i = 0;
+		foreach ($itemResults as $key => $value) {
+			$item = json_decode(json_encode($value->f), true);
+			
+			$itemInfo = array(
+				'loanBuyNumber' => $item[0],
+				'amount' => $item[1],
+				'article' => $item[2],
+				'brand' => $item[3],
+				'serialNumber' => $item[4],
+				'description' => $item[5],
+			);
 
+			$transactionInfo['items'][$i] = $itemInfo;
+			$i++;
+		}
 
 
 
@@ -386,25 +418,25 @@ function create_xml($return_array) {
 			$items = $propertyTransaction->appendChild(
 				$xmlDoc->createElement("items"));
 
-			// foreach ($items as $item) {
+			foreach ($transactionInfo['items'] as $item) {
 				$item = $items->appendChild(
 					$xmlDoc->createElement("item"));
 					$itemType = $item->appendChild(
 						$xmlDoc->createElement("type", 'BUY'));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("loanBuyNumber", '1234'));
+						$xmlDoc->createElement("loanBuyNumber", $item['loanBuyNumber']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("amount", '713.00'));
+						$xmlDoc->createElement("amount", $item['amount']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("article", 'WATCH'));
+						$xmlDoc->createElement("article", $item['article']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("brand", 'ROLEX'));
+						$xmlDoc->createElement("brand", $item['brand']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("serialNumber", '123U601945'));
+						$xmlDoc->createElement("serialNumber", $item['serialNumber']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("description", 'S G ENGRAVED ON BACK,COLOR-GOLDEN,VALUE$10,000'));
+						$xmlDoc->createElement("description", $item['description']));
 
-			// }
+			}
 	}
 	return $xmlDoc;
 }

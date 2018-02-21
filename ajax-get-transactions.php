@@ -234,7 +234,7 @@ if ( !isset($location) ) {
 		$itemResults = $itemResults->table->records->record;
 		// echo '<pre>'; print_r(count($itemResults)); echo '</pre>';die('here');
 
-		//check if there is a license number and do not continue
+		//check if there are items and do not continue
 		if (count($itemResults)=== 0) {
 			$return_array['status'] = 0;
 			$return_array['error'] = 'There are no items for Record ' . $transactionInfo['recordId'];
@@ -364,8 +364,7 @@ function create_xml($return_array) {
 		$xmlDoc->createElement("bulkUploadData"));
 	$bulkUploadData->appendChild(
 		$xmlDoc->createAttribute("licenseNumber"))->appendChild(
-			$xmlDoc->createTextNode("33131099"));
-		//$return_array['location_license']
+			$xmlDoc->createTextNode($return_array['location_license']));
 
 	foreach ($return_array['transactions'] as $transactionInfo) {
 		$propertyTransaction = $bulkUploadData->appendChild(
@@ -427,24 +426,23 @@ function create_xml($return_array) {
 			$items = $propertyTransaction->appendChild(
 				$xmlDoc->createElement("items"));
 
-			foreach ($transactionInfo['items'] as $item) {
+			for ($i=0; $i < count($transactionInfo['items']); $i++) { 
 				$item = $items->appendChild(
 					$xmlDoc->createElement("item"));
 					$itemType = $item->appendChild(
 						$xmlDoc->createElement("type", 'BUY'));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("loanBuyNumber", $item['loanBuyNumber']));
+						$xmlDoc->createElement("loanBuyNumber", $transactionInfo['items'][$i]['loanBuyNumber']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("amount", $item['amount']));
+						$xmlDoc->createElement("amount", $transactionInfo['items'][$i]['amount']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("article", $item['article']));
+						$xmlDoc->createElement("article", $transactionInfo['items'][$i]['article']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("brand", $item['brand']));
+						$xmlDoc->createElement("brand", $transactionInfo['items'][$i]['brand']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("serialNumber", $item['serialNumber']));
+						$xmlDoc->createElement("serialNumber", $transactionInfo['items'][$i]['serialNumber']));
 					$itemReferenceId = $item->appendChild(
-						$xmlDoc->createElement("description", $item['description']));
-
+						$xmlDoc->createElement("description", $transactionInfo['items'][$i]['description']));
 			}
 	}
 	return $xmlDoc;

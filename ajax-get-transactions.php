@@ -176,6 +176,15 @@ if ( !isset($location) ) {
 			$gender = 'Females';
 		}
 
+		$customerSigniture = $customerResults[19];
+		if ($customerSigniture['url']) {
+			$customerSigniture = base64_encode(file_get_contents($customerSigniture['url']));
+		}
+		$customerThumbprint = $customerResults[20];
+		if ($customerThumbprint['url']) {
+			$customerThumbprint = base64_encode(file_get_contents($customerThumbprint['url']));
+		}
+
 		// set the customer information for the transaction
 		$transactionInfo['customerInfo'] = array(
 			'firstName' => $customerResults[0],
@@ -196,8 +205,8 @@ if ( !isset($location) ) {
 			'idIssueState' => $customerResults[16],
 			'idIssueCountry' => $customerResults[17],
 			'idYearOfExpiration' => $customerResults[18],
-			// 'customerSignature' => $customerResults[19],
-			// 'customerThumbprint' => $customerResults[20],
+			// 'customerSignature' => $customerSigniture,
+			// 'customerThumbprint' => $customerThumbprint,
 		);
 		// echo '<pre>'; print_r($transactionInfo['customerInfo']); echo '</pre>';die('here');
 

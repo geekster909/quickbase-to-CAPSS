@@ -168,6 +168,14 @@ if ( !isset($location) ) {
 		$heightInches = is_array($customerResults[11]) ? '7' : $customerResults[11];
 		$weight = is_array($customerResults[12]) ? '175' : $customerResults[12];
 
+		// set gender if M or F
+		$gender = $customerResults[7];
+		if ($gender == 'M' || $gender == 'm') {
+			$gender = 'Male';
+		} elseif ($gender == 'F' || $gender == 'f') {
+			$gender = 'Females';
+		}
+
 		// set the customer information for the transaction
 		$transactionInfo['customerInfo'] = array(
 			'firstName' => $customerResults[0],
@@ -177,7 +185,7 @@ if ( !isset($location) ) {
 			'city' => $customerResults[4],
 			'state' => $customerResults[5],
 			'postalCode' => $customerResults[6],
-			'gender' => $customerResults[7],
+			'gender' => $gender,
 			'hairColor' => $hairColor,
 			'eyeColor' => $eyeColor,
 			'height' => $heightFeet.'0'.$heightInches,

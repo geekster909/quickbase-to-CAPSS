@@ -173,7 +173,7 @@ if ( !isset($location) ) {
 		if ($gender == 'M' || $gender == 'm') {
 			$gender = 'Male';
 		} elseif ($gender == 'F' || $gender == 'f') {
-			$gender = 'Females';
+			$gender = 'Female';
 		}
 
 		// do the query in the CUSTOMERS table for thumbprint

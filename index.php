@@ -11,8 +11,11 @@
 
 </style>
 <?php
-	date_default_timezone_set('UTC');
-	$timestamp = strtotime('yesterday midnight');
+	// date_default_timezone_set('UTC');
+	date_default_timezone_set('America/New_York');
+	// echo '<pre>'; print_r(date('D-d-M-Y H:i', strtotime('midnight'))); echo '</pre>';die('here');
+	// $timestamp = strtotime('yesterday midnight');
+	$timestamp = strtotime('midnight');
 	// $timestamp = strtotime('-2 days', strtotime('yesterday midnight'));
 	echo 'The day being processed is <strong>' . gmdate("m-d-Y", $timestamp) . '</strong>';
 ?>

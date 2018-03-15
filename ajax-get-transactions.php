@@ -5,10 +5,11 @@ date_default_timezone_set('America/New_York');
 $postData = json_decode(file_get_contents('php://input'));
 $location = $postData->location;
 $locationCity = str_replace(' ', '_', substr($location, 0, strpos($location, ',')));
-$yesterdayMidnight = strtotime('yesterday midnight');
-$todayMidnight = strtotime('midnight');
+// $yesterdayMidnight = strtotime('yesterday midnight');
+// $todayMidnight = strtotime('midnight');
 // $yesterdayMidnight = strtotime('-2 days', strtotime('yesterday midnight'));
-$timestamp = ($todayMidnight*1000);
+$submittedTimestamp = $postData->timestamp;
+$timestamp = ($submittedTimestamp*1000);
 
 include_once('settings.php');// include the account info variables
 include_once('quickbase.php');//include the api file
@@ -23,7 +24,7 @@ if ( !isset($location) ) {
 		'status' => 1,
 		'location' => $location,
 		'locationCity' => $locationCity,
-		'xmlPath' => 'xml/'.gmdate("Y", $todayMidnight).'/'.gmdate("m", $todayMidnight).'/'.gmdate("d", $todayMidnight),
+		'xmlPath' => 'xml/'.gmdate("Y", $submittedTimestamp).'/'.gmdate("m", $submittedTimestamp).'/'.gmdate("d", $submittedTimestamp),
 		'timestamp' => array(
 			'milliseconds' => $timestamp,
 			'date' => gmdate("m-d-Y", $timestamp / 1000)
@@ -40,7 +41,7 @@ if ( !isset($location) ) {
 		array(
 			'fid'  => '46', // Feild ID
 			'ev'   => 'EX', // Exact
-			'cri'  => ($todayMidnight*1000) // criteria
+			'cri'  => ($submittedTimestamp*1000) // criteria
 		),
 		array(
 			'ao'  => 'AND',//OR is also acceptable

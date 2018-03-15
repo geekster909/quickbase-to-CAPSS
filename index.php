@@ -15,9 +15,12 @@
 	date_default_timezone_set('America/New_York');
 	// echo '<pre>'; print_r(date('D-d-M-Y H:i', strtotime('midnight'))); echo '</pre>';die('here');
 	// $timestamp = strtotime('yesterday midnight');
-	$timestamp = strtotime('midnight');
+	// $timestamp = strtotime('midnight');
 	// $timestamp = strtotime('-2 days', strtotime('yesterday midnight'));
-	echo 'The day being processed is <strong>' . gmdate("m-d-Y", $timestamp) . '</strong>';
+	// echo 'The day being processed is <strong>' . gmdate("m-d-Y", $timestamp) . '</strong>';
+	$timestampToday = strtotime('midnight');
+	$timestampYesterday = strtotime('yesterday midnight');
+	$timestampTwoDaysAgo = strtotime('-1 days', strtotime('yesterday midnight'));
 ?>
 <br/>
 <br/>
@@ -56,30 +59,31 @@
 	console.log(scriptStatus);
 	locationForm.addEventListener('submit', function(e){
 		e.preventDefault();
-		var selectedOption = document.getElementById('js-location').value;
+		var selectedDate = document.getElementById('js-date').value;
+		var selectedLocation = document.getElementById('js-location').value;
 
 		results.innerHTML += '----------------------------------- START REPORT -----------------------------------<br/>';
 		
 		
 
-		if (selectedOption != '') {
-			results.innerHTML += 'Running scripts for location: '+selectedOption+'<br/><br/>';
+		if (selectedLocation != '' && selectedDate != '') {
+			results.innerHTML += 'Running scripts for location: '+selectedLocation+'<br/><br/>';
 	
-			ajax(selectedOption);
+			ajax(selectedLocation, selectedDate);
 
 			scriptStatus.innerHTML = 'Loading...';
 			document.getElementById("form-submit").disabled = true;
 		} else {
-			results.innerHTML += 'Please select a location';
+			results.innerHTML += 'Please select a date and location';
 			results.innerHTML += '<br/>------------------------------------- END REPORT -------------------------------------<br/><br/>';
 		}
 	});
 
-	async function ajax(selectedOption) {
+	async function ajax(selectedLocation, selectedDate) {
 		try {
 			let response = await fetch('ajax-get-transactions.php', {
 				method: 'POST',
-				body: JSON.stringify({location: selectedOption}),
+				body: JSON.stringify({location: selectedLocation, timestamp: selectedDate}),
 				headers: {
 					"Content-type": "application/json"
 				}

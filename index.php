@@ -25,21 +25,35 @@
 <br/>
 <br/>
 <form id="location-form" method="post">
-	<select id="js-location">
-		<option value="">--Select Location--</option>
-		<option value="Carlsbad, 2525 El Camino Real #231">Carlsbad, 2525 El Camino Real #231</option>
-		<option value="Chino, 12924 Central Ave.">Chino, 12924 Central Ave.</option>
-		<option value="Corona, 1297 E. Ontario Ave Suite 104">Corona, 1297 E. Ontario Ave Suite 104</option>
-		<option value="Hemet, 326 S. Sanderson Ave">Hemet, 326 S. Sanderson Ave</option>
-		<option value="Ontario, 980 N. Ontario Mills Drive Suite B">Ontario, 980 N. Ontario Mills Drive Suite B</option>
-		<option value="Palm Desert, 72333 Highway 111 Suite C">Palm Desert, 72333 Highway 111 Suite C</option>
-		<option value="Rancho Santa Margarita, 30352 Esperanza">Rancho Santa Margarita, 30352 Esperanza</option>
-		<option value="Redlands, 1615 W. Redlands Blvd Suite F">Redlands, 1615 W. Redlands Blvd Suite F</option>
-		<option value="Riverside, 10319 Magnolia Ave.">Riverside, 10319 Magnolia Ave.</option>
-		<option value="San Bernardino, 222 Inland Center">San Bernardino, 222 Inland Center</option>
-		<option value="Victorville, 14400 Bear Valley Road">Victorville, 14400 Bear Valley Road</option>
-		<option value="West Covina, 633 Plaza Drive">West Covina, 633 Plaza Drive</option>
-	</select>
+	<div>
+		<label for="js-date"> Select a Date</label>
+		<select id="js-date">
+			<option value="">--Select Date--</option>
+			<option value="<?php echo $timestampToday; ?>"><?php echo gmdate("m-d-Y", $timestampToday); ?></option>
+			<option value="<?php echo $timestampYesterday; ?>"><?php echo gmdate("m-d-Y", $timestampYesterday); ?></option>
+			<option value="<?php echo $timestampTwoDaysAgo; ?>"><?php echo gmdate("m-d-Y", $timestampTwoDaysAgo); ?></option>
+		</select>
+	</div>
+	<br />
+	<div>
+		<label for="js-location"> Select a location</label>
+		<select id="js-location">
+			<option value="">--Select Location--</option>
+			<option value="Carlsbad, 2525 El Camino Real #231">Carlsbad, 2525 El Camino Real #231</option>
+			<option value="Chino, 12924 Central Ave.">Chino, 12924 Central Ave.</option>
+			<option value="Corona, 1297 E. Ontario Ave Suite 104">Corona, 1297 E. Ontario Ave Suite 104</option>
+			<option value="Hemet, 326 S. Sanderson Ave">Hemet, 326 S. Sanderson Ave</option>
+			<option value="Ontario, 980 N. Ontario Mills Drive Suite B">Ontario, 980 N. Ontario Mills Drive Suite B</option>
+			<option value="Palm Desert, 72333 Highway 111 Suite C">Palm Desert, 72333 Highway 111 Suite C</option>
+			<option value="Rancho Santa Margarita, 30352 Esperanza">Rancho Santa Margarita, 30352 Esperanza</option>
+			<option value="Redlands, 1615 W. Redlands Blvd Suite F">Redlands, 1615 W. Redlands Blvd Suite F</option>
+			<option value="Riverside, 10319 Magnolia Ave.">Riverside, 10319 Magnolia Ave.</option>
+			<option value="San Bernardino, 222 Inland Center">San Bernardino, 222 Inland Center</option>
+			<option value="Victorville, 14400 Bear Valley Road">Victorville, 14400 Bear Valley Road</option>
+			<option value="West Covina, 633 Plaza Drive">West Covina, 633 Plaza Drive</option>
+		</select>
+	</div>
+	<br />
 	<button id="form-submit" type="submit">Submit</button>
 </form>
 <div>

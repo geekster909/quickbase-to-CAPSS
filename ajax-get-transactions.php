@@ -204,6 +204,7 @@ if ( !isset($location) ) {
 			'city' => $customerResults[4],
 			'state' => $customerResults[5],
 			'postalCode' => $customerResults[6],
+			'phoneNumber' => '',
 			'gender' => $gender,
 			'hairColor' => $hairColor,
 			'eyeColor' => $eyeColor,
@@ -241,7 +242,8 @@ if ( !isset($location) ) {
 
 		//set the store info for the transaction
 		$transactionInfo['storeInfo'] = array(
-			'employeeName' => $employeeFullName
+			'employeeName' => $employeeFullName,
+			'employeeSignature' => ''
 		);
 
 		// create the object for the ITEMS table

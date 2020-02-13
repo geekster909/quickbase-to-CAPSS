@@ -246,7 +246,7 @@ if ( !isset($location) ) {
 			'city' => $customerResults[4],
 			'state' => $customerResults[5],
 			'postalCode' => $customerResults[6],
-			'phoneNumber' => '',
+			// 'phoneNumber' => '',
 			'gender' => $gender,
 			'hairColor' => $hairColor,
 			'eyeColor' => $eyeColor,
@@ -265,7 +265,7 @@ if ( !isset($location) ) {
 
 		// Loop through Customer Info to make sure there are values
 		foreach($transactionInfo['customerInfo'] as $key => $value) {
-			if (is_array($value)) {
+			if (is_array($value) || empty($value)) {
 				$return_array['status'] = 0;
 				$return_array['error'] = 'Customer Field "'.$key.'" has no value for Record ' . $transactionInfo['recordId'];
 				echo json_encode($return_array);
@@ -317,6 +317,14 @@ if ( !isset($location) ) {
 				'brand' => $item[3],
 				'serialNumber' => $item[4],
 				'description' => $item[5],
+				'model' => 'None',
+				'ownerAppliedNumber' => 'None',
+				'inscription' => 'None',
+				'pattern' => 'None',
+				'itemSize' => 'Unknown',
+				'sizeUnit' => 'Unknown',
+				'color' => 'Other',
+				'material' => 'Unknown',
 			);
 
 			$transactionInfo['items'][$i] = $itemInfo;
@@ -456,8 +464,8 @@ function create_xml($return_array) {
 					$xmlDoc->createElement("state", $transactionInfo['customerInfo']['state']));
 				$postalCode = $customer->appendChild(
 					$xmlDoc->createElement("postalCode", $transactionInfo['customerInfo']['postalCode']));
-				$phoneNumber = $customer->appendChild(
-					$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
+				// $phoneNumber = $customer->appendChild(
+				// 	$xmlDoc->createElement("phoneNumber", $transactionInfo['customerInfo']['phoneNumber']));
 				$id = $customer->appendChild(
 					$xmlDoc->createElement("id"));
 					$idType = $id->appendChild(
@@ -502,6 +510,22 @@ function create_xml($return_array) {
 						$xmlDoc->createElement("serialNumber", $transactionInfo['items'][$i]['serialNumber']));
 					$itemReferenceId = $item->appendChild(
 						$xmlDoc->createElement("description", $transactionInfo['items'][$i]['description']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("model", $transactionInfo['items'][$i]['model']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("ownerAppliedNumber", $transactionInfo['items'][$i]['ownerAppliedNumber']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("inscription", $transactionInfo['items'][$i]['inscription']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("pattern", $transactionInfo['items'][$i]['pattern']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("itemSize", $transactionInfo['items'][$i]['itemSize']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("sizeUnit", $transactionInfo['items'][$i]['sizeUnit']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("color", $transactionInfo['items'][$i]['color']));
+					$itemReferenceId = $item->appendChild(
+						$xmlDoc->createElement("material", $transactionInfo['items'][$i]['material']));
 			}
 	}
 	return $xmlDoc;

@@ -407,6 +407,14 @@ function create_xml($return_array) {
 			Brand Name
 			Serial Number
 			Property Description (One Item Only, Size, Color, Material, etc...)
+			Model
+			Owner Applied Number
+			Inscription
+			Pattern
+			Item Size
+			Size Unit
+			Color
+			Material
 
 		SIGNITURE
 			Customer Signiture (image)
